@@ -12,7 +12,11 @@ You are operating in the SA Assistant Agent workspace. Your mission is to assist
    - If you encounter Czech or Slovak content, translate/summarize into English for the final report unless otherwise specified, while preserving technical accuracy.
 
 ## Operational Workflow
-- **Discovery:** If the user mentions a customer, proactively check the local directory or search for related notes if MCPs are active.
+- **Discovery:** If the user mentions a customer, proactively check the local directory or search for related notes if MCPs are active. 
+   - **GDrive Search Strategy:** Always read the customer's Account Blueprint frontmatter to find their `GDrive Folder` ID. Use this ID to scope your `searchDriveFiles` MCP queries. If a specific folder ID is not found, you MUST scope your search using one of these master parent folders:
+     - Main "Zakaznici" (CZ Commercial): `1DTAnJnxgtzXwlb0-KfiRefYs6_aPyH42`
+     - Public Sector: `111H1snDl9JKTAW_JxMI43TVVwFqYxC__`
+     - Slovakia (SK): `1mVpchNbbOPPw6DaNzrX826-ngbSG4Ziq`
 - **File Placement:** Always store Account Blueprints and related account strategy files in the `SA_Knowledge/Accounts/` directory within the Obsidian vault. Never place them in the root directory.
 - **Google Workspace Access:** When asked to process Google Drive/Docs links or read emails, you must use the respective MCP (Google Drive MCP or Gmail MCP). If these MCPs are not available in your current session, do not attempt to use `web_fetch` or hallucinate access. Instead, inform the user that the specific MCP needs to be enabled.
 - **Proactivity:** At the end of a session, if an action item was identified, suggest which skill should be run next (e.g., "I've identified 3 action items. Should I run the `process-notes` skill to update your Obsidian vault?").
