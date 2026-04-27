@@ -1,0 +1,8 @@
+# Downloaded Red Hat Documentation
+OpenShift_AI_3.4_PDFs/
+RHEL_10_PDFs/
+RedHat_Docs/
+pdf_urls.txt
+
+# Gemini CLI local files
+.gemini/

@@ -1,0 +1,9 @@
+{
+  "name": "rh-docs-downloader",
+  "version": "1.0.0",
+  "description": "Script to download Red Hat documentation PDFs",
+  "main": "download_rh_docs.js",
+  "dependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

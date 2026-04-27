@@ -9,6 +9,7 @@ Skills are specialized, repeatable workflows that guide the Gemini CLI to perfor
 - **`analyze-emails`**: Uses the Gmail MCP to analyze recent email threads with a target, extracting active initiatives, SA action items, and stalled/forgotten conversations.
 - **`schedule-tasks`**: Bridges Obsidian tasks to Google Calendar focus blocks with automated deep-linking and work-hour enforcement.
 - **`redact-confidential`**: (Planned) Automatically anonymizes customer data for external reporting.
+- **`rh-docs-downloader`**: Downloads all Red Hat product documentation guides as PDFs when provided with a base documentation URL.
 
 ## How to use
 To invoke a skill, you can tell the CLI:
