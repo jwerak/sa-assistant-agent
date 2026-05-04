@@ -4,7 +4,7 @@
 To build a highly personalized, secure, and context-aware digital assistant tailored for the specific workflow of a Solutions Architect (Pre-sales) operating in the Google Cloud ecosystem. This project bridges the gap between structured meeting notes (Google Docs), local personal knowledge (Obsidian), and real-time communication (Gmail/Calendar).
 
 ## Core Principles
-1. **Security & Confidentiality First:** All data processing respects the user's Enterprise Gemini privacy standards. Sensitive data stays within the Google/Local boundary.
+1. **Security & Confidentiality First:** All data processing respects enterprise-grade privacy standards. Sensitive data stays within the Google/Local boundary.
 2. **Contextual Intelligence:** Leverage MCP (Model Context Protocol) to seamlessly access Google Workspace and Obsidian data.
 3. **Action-Oriented:** Focus on reducing administrative overhead (meeting prep, note processing) and enhancing strategic planning (account strategy, technical brainstorming).
 

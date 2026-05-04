@@ -4,5 +4,11 @@ RHEL_10_PDFs/
 RedHat_Docs/
 pdf_urls.txt
 
-# Gemini CLI local files
+# Customer account data (belongs in Obsidian vault, not this repo)
+*Account Notes*
+*Account Blueprint*
+SA_Knowledge/
+
+# AI CLI local state
 .gemini/
+.claude/

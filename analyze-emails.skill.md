@@ -9,7 +9,7 @@ Analyzes recent email threads (using the Gmail MCP) with a specific customer, ac
 - "Run the `analyze-emails` skill for..."
 
 ## Workflow
-1. **Search & Fetch:** Use the Gmail MCP to search for recent emails matching the user's criteria (e.g., domain:cez.cz, or specific keywords). Fetch the most recent and relevant threads (typically last 3-6 months unless specified otherwise).
+1. **Search & Fetch:** Use the Gmail MCP to search for recent emails matching the user's criteria (e.g., domain:acme-corp.com, or specific keywords). Fetch the most recent and relevant threads (typically last 3-6 months unless specified otherwise).
 2. **Analysis:** Read the threads specifically looking for:
    - **Active Initiatives:** Projects or technical discussions that are currently moving forward.
    - **SA Action Items:** Things the Solutions Architect explicitly promised to do, send, or research.

@@ -1,7 +1,7 @@
 # SA Assistant Agent: Skills Overview
 
 ## Purpose
-Skills are specialized, repeatable workflows that guide the Gemini CLI to perform specific tasks. Unlike Agents, which define a "persona," Skills define a "procedure."
+Skills are specialized, repeatable workflows that guide the AI assistant to perform specific tasks. Unlike Agents, which define a "persona," Skills define a "procedure."
 
 ## Registry
 - **`process-notes`**: Converts raw meeting notes (from Obsidian or Google Docs) into a structured format with summaries, action items, and technical requirements.
@@ -12,5 +12,5 @@ Skills are specialized, repeatable workflows that guide the Gemini CLI to perfor
 - **`rh-docs-downloader`**: Downloads all Red Hat product documentation guides as PDFs when provided with a base documentation URL.
 
 ## How to use
-To invoke a skill, you can tell the CLI:
+To invoke a skill, tell your AI CLI assistant:
 `"Run the process-notes skill on [Path/to/file]"` or `"Help me prep for my meeting with [Customer] using the prep-meeting skill."`
