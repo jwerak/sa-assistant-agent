@@ -12,3 +12,4 @@ SA_Knowledge/
 # AI CLI local state
 .gemini/
 .claude/
+.env

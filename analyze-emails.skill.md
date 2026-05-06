@@ -4,7 +4,7 @@
 Analyzes recent email threads (using the Gmail MCP) with a specific customer, account team, or stakeholder. The goal is to extract active technical initiatives, pending action items, and identify "stalled" conversations that require a follow-up.
 
 ## Trigger
-- "Go through my emails with [Customer/Person]..."
+- "Go through my emails with [Company/Person]..."
 - "Analyze my recent email threads about [Topic]..."
 - "Run the `analyze-emails` skill for..."
 
@@ -21,7 +21,7 @@ Analyzes recent email threads (using the Gmail MCP) with a specific customer, ac
 Present the findings to the user in the following markdown structure. Do not save this directly to Obsidian unless the user asks you to append it to the Account Blueprint.
 
 ```markdown
-### 📧 Email Intelligence Report: [Target/Customer]
+### 📧 Email Intelligence Report: [Target/Company]
 
 **Timeframe Analyzed:** [e.g., Last 3 months]
 

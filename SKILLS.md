@@ -10,7 +10,8 @@ Skills are specialized, repeatable workflows that guide the AI assistant to perf
 - **`schedule-tasks`**: Bridges Obsidian tasks to Google Calendar focus blocks with automated deep-linking and work-hour enforcement.
 - **`redact-confidential`**: (Planned) Automatically anonymizes customer data for external reporting.
 - **`rh-docs-downloader`**: Downloads all Red Hat product documentation guides as PDFs when provided with a base documentation URL.
+- **`generate-vault-index`**: Runs a Python script to regenerate `_vault_index.md` and `_stakeholder_map.md` from vault frontmatter, then reports consistency warnings.
 
 ## How to use
 To invoke a skill, tell your AI CLI assistant:
-`"Run the process-notes skill on [Path/to/file]"` or `"Help me prep for my meeting with [Customer] using the prep-meeting skill."`
+`"Run the process-notes skill on [Path/to/file]"` or `"Help me prep for my meeting with [Company] using the prep-meeting skill."`

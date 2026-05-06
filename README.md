@@ -29,8 +29,9 @@ The repository follows a clear **Data Strategy** as defined in `AGENTS.md`:
 This repository is designed for use with AI CLI assistants that support MCP (Model Context Protocol), such as **Claude Code** or **Gemini CLI**.
 
 ### Setup
-1. Ensure your Obsidian vault and Google Workspace MCPs are active.
-2. Ask for specific tasks like:
+1. Copy `.env.example` to `.env` and set `SA_KNOWLEDGE_PATH` to your Obsidian vault root.
+2. Ensure your Google Workspace MCPs are active.
+3. Ask for specific tasks like:
    - *"Analyze my recent emails with Acme Corp."*
    - *"Run the process-notes skill on my latest meeting log."*
    - *"Block 90 minutes on Monday for Acme Corp preparation."*
@@ -39,4 +40,5 @@ This repository is designed for use with AI CLI assistants that support MCP (Mod
 This agent adheres to high privacy standards:
 - Customer confidential data stays within the user's secure boundaries (Local / Google Workspace).
 - No sensitive customer data is stored in this repository; only the logic to process it.
-- Customer account notes, blueprints, and all account-specific data belong in the Obsidian vault (`SA_Knowledge/`), never in this repo.
+- Customer account notes, blueprints, and all account-specific data belong in the Obsidian vault (`$SA_KNOWLEDGE_PATH/SA_Knowledge/`), never in this repo.
+- The `.env` file containing your local vault path is gitignored.
