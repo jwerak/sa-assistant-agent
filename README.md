@@ -31,7 +31,12 @@ Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [Gem
   - [Account Blueprints](#account-blueprints)
   - [Task Notes](#task-notes)
   - [Canonical Company Names](#canonical-company-names)
-  - [Tags, Properties, and Categories](#tags-properties-and-categories)
+- [How Notes Connect](#how-notes-connect)
+  - [Tags, Properties, and Wikilinks](#tags-properties-and-wikilinks)
+  - [Cross-Referencing Between Notes](#cross-referencing-between-notes)
+  - [Atlas and Navigation](#atlas-and-navigation)
+  - [Obsidian Bases (Dashboards)](#obsidian-bases-dashboards)
+  - [Auto-Generated Indexes](#auto-generated-indexes)
 - [Customizing for Your Accounts](#customizing-for-your-accounts)
 - [Usage Examples](#usage-examples)
 - [Troubleshooting](#troubleshooting)
@@ -497,21 +502,254 @@ Bad:  [[Acme Corp]], [[acme-corp]], [[ACME]], [[Acme Corporation]]
 
 When you fork this project, replace the example company names in `CLAUDE.md` with your own accounts. The `generate-vault-index` skill validates all company references against this list.
 
-### Tags, Properties, and Categories
+---
 
-**When to use each:**
+## How Notes Connect
 
-| Mechanism | Purpose | Example |
-|---|---|---|
-| **Frontmatter properties** | Structured, queryable fields that dashboards and scripts depend on. Use for status, date, company, type. | `status: open`, `type: sync` |
-| **Tags** | Lightweight labels for topics, products, or themes. Free-form. Used for filtering in Obsidian search and Bases. | `tags: [openshift, migration, rhel]` |
-| **Wikilinks** | Connections between notes. Used for company names, participant names, and project references. Creates navigable relationships in Obsidian's graph view. | `company: "[[Acme_Corp]]"` |
-| **Folders** | Broad categorization by note type. Don't over-nest. | `Meetings/`, `Tasks/`, `Accounts/` |
+The vault's power comes from how notes reference each other. Frontmatter properties, tags, wikilinks, and Obsidian Bases work together to create a navigable knowledge graph where you can move from an account to its meetings, from a meeting to its participants, and from a person to every account they're involved with.
+
+### Tags, Properties, and Wikilinks
+
+The vault uses three complementary mechanisms to organize information. Each serves a different purpose -- using the wrong one makes data harder to find or query.
+
+| Mechanism | Purpose | Queryable by Bases? | Example |
+|---|---|---|---|
+| **Frontmatter properties** | Structured fields that dashboards and scripts depend on. Use for status, date, company, type, priority. | Yes -- this is the primary query mechanism | `status: open`, `type: sync` |
+| **Tags** | Lightweight labels for topics, products, or themes. Used to classify what a note is _about_. | Yes -- via `file.hasTag()` or `file.tags.contains()` | `tags: [openshift, migration]` |
+| **Wikilinks** | Navigable connections between notes. Used for company names, participant names, and project references. Creates edges in Obsidian's graph view. | Yes -- via property value matching (e.g., `customer.contains("Acme")`) | `company: "[[Acme_Corp]]"` |
+| **Folders** | Broad categorization by note type. Keep flat -- don't over-nest. | Yes -- via `file.inFolder()` | `Meetings/`, `Tasks/`, `Accounts/` |
+
+**When to use which:**
+
+- **"Is this a meeting, task, or account?"** -- Use a tag (`meeting`, `task`, `account`) AND a folder (`Meetings/`, `Tasks/`, `Accounts/`). Both together give you two independent ways to query.
+- **"Who is this about?"** -- Use a wikilink in a frontmatter property: `company: "[[Acme_Corp]]"`. This creates a clickable link AND a queryable field.
+- **"What technologies are involved?"** -- Use tags: `tags: [openshift, rhel, ansible]`. Tags are free-form and don't need a corresponding note to exist.
+- **"What is the current state?"** -- Use a frontmatter property: `status: open`, `priority: high`. Properties have controlled vocabularies that dashboards filter on.
 
 **Tag conventions:**
-- Use lowercase, hyphen-separated tags: `cloud-migration`, not `Cloud Migration`
-- Product tags match Red Hat naming: `openshift`, `rhel`, `ansible`, `aap`
-- Use `tags:` (list format) in frontmatter, not inline `#tags` in body text -- this makes them queryable by Bases
+- Use lowercase, hyphen-separated: `cloud-migration`, not `Cloud Migration`
+- Product tags match vendor naming: `openshift`, `rhel`, `ansible`, `aap`, `rhoai`
+- Always include the type tag: `meeting`, `task`, `account`, or `project`
+- Always include `sa-knowledge` as a base tag (used in global filters)
+- Put tags in frontmatter (`tags: [...]`), not inline in body text (`#tag`) -- frontmatter tags are queryable by Bases
+
+**Example -- a well-tagged meeting note:**
+
+```yaml
+tags: [meeting, sa-knowledge, workshop, openshift, ai, rhoai]
+```
+
+This note is findable by: its type (meeting), its vault membership (sa-knowledge), the meeting format (workshop), and the technologies discussed (openshift, ai, rhoai). A dashboard filtering for `file.hasTag("meeting")` picks it up. A search for `rhoai` surfaces it.
+
+### Cross-Referencing Between Notes
+
+Notes reference each other through wikilinks in frontmatter properties. This creates a web of connections that you can navigate by clicking, and that Bases can query programmatically.
+
+**Account <-> Meeting:**
+
+```
+Account Blueprint (Acme_Corp.md)        Meeting Note (2025-06-15_Acme_Sync.md)
+┌─────────────────────────────────┐     ┌──────────────────────────────────┐
+│                                 │     │ ---                              │
+│ ## Interaction Log              │     │ company: "[[Acme_Corp]]"  ───────┼──> links back to Account
+│ ![[Acme_Corp_Meetings.base]] ───┼──>  │ participants:                    │
+│                                 │     │   - "[[John Doe]]"               │
+│ (dynamically lists all meetings │     │   - "[[Jane Smith]]"             │
+│  where company = Acme_Corp)     │     │ ---                              │
+└─────────────────────────────────┘     └──────────────────────────────────┘
+```
+
+- The meeting note's `company: "[[Acme_Corp]]"` creates a clickable link to the Account Blueprint.
+- The Account Blueprint embeds a `.base` file that dynamically queries all meetings with that company. No manual list to maintain.
+
+**Task <-> Account:**
+
+```yaml
+# In a task note:
+customer: "[[Acme_Corp]]"       # Links to the Account Blueprint
+project: "[[Cloud Migration]]"  # Links to a project note (if one exists)
+```
+
+Clicking `[[Acme_Corp]]` from a task opens the Account Blueprint. The Global Tasks Dashboard queries all tasks and groups them by customer.
+
+**Person network:**
+
+Every `[[Person Name]]` wikilink in a `participants:` field is automatically tracked. The auto-generated `_stakeholder_map.md` aggregates these across the entire vault, showing:
+- Which accounts each person appears in
+- How many meetings they've attended
+- When they were last seen
+
+This means you can answer "When did I last meet with John Doe?" or "Which accounts is Jane Smith involved with?" without searching manually.
+
+**Inline references in note body:**
+
+Beyond frontmatter, you can reference other notes anywhere in the body text:
+
+```markdown
+Follow-up from [[2025-05-15_Acme_Workshop]] -- they confirmed the 
+architecture from [[Acme_Corp]] section 3 is approved. Next step is 
+the [[Cloud Migration]] PoC.
+```
+
+These create graph edges in Obsidian and enable backlink navigation.
+
+### Atlas and Navigation
+
+The Atlas is a set of high-level entry points that give you a bird's-eye view of the vault. Think of it as the "home screen" -- you land here and navigate down to specific accounts, meetings, or tasks.
+
+**Vault entry points:**
+
+```
+SA_Knowledge/
+├── _VAULT_MAP.md              # Manual: folder structure, canonical names, conventions
+├── _vault_index.md            # Auto-generated: statistics, all accounts/meetings/tasks
+├── _stakeholder_map.md        # Auto-generated: person cross-reference table
+├── Accounts_Dashboard.base    # Live: all accounts in a sortable table
+├── Global_Tasks_Dashboard.base  # Live: open tasks as table + Kanban board
+├── Active_Projects_Dashboard.base  # Live: active projects overview
+└── Global_Backlog.base        # Live: complete backlog with sub-task expansion
+```
+
+**How to navigate:**
+
+1. **Starting a session:** Open `_vault_index.md` for a quick overview of vault statistics and recent activity. The AI assistant reads this file on cold start to orient itself.
+2. **Finding an account:** Open `Accounts_Dashboard.base` for a sortable table of all accounts with tier, industry, and status. Click any account to open its blueprint.
+3. **Reviewing tasks:** Open `Global_Tasks_Dashboard.base` and switch between table view (sorted by priority) and Kanban view (grouped by status: open / in-progress / blocked / done).
+4. **Preparing for a meeting:** Open the relevant Account Blueprint -- scroll to the Interaction Log section at the bottom, which embeds the account's `.base` file showing all past meetings sorted by date.
+5. **Finding a person:** Open `_stakeholder_map.md` and search for a name. See which accounts they touch and when you last interacted.
+
+**The `_VAULT_MAP.md` file** is the human-written reference for vault conventions. It documents:
+- The folder hierarchy and what goes where
+- Canonical company names (the authoritative list)
+- Frontmatter schemas for each note type
+- Tagging conventions
+
+This is the file to update when you add a new account or change a convention.
+
+### Obsidian Bases (Dashboards)
+
+[Obsidian Bases](https://obsidian.md/blog/bases/) is a core plugin that turns frontmatter into queryable databases. `.base` files define filters, columns, sorting, and view types -- the plugin renders them as interactive tables or card grids inside Obsidian.
+
+**Why Bases instead of Dataview:** Bases is a native Obsidian feature with a visual editor, simpler syntax, and better performance. The assistant always creates `.base` files, never Dataview queries.
+
+**There are two levels of dashboards:**
+
+#### Global Dashboards (root of SA_Knowledge/)
+
+These query across the entire vault.
+
+**Accounts Dashboard** (`Accounts_Dashboard.base`):
+
+```yaml
+filters:
+  and:
+    - file.inFolder("SA_Knowledge/Accounts")
+    - file.hasTag("account")
+views:
+  - type: table
+    name: "All Accounts"
+    sort:
+      - property: "Account Tier"
+        direction: ASC
+    columns:
+      - property: file.name     # Account name
+      - property: Industry
+      - property: Account Tier
+      - property: Primary SA
+      - property: Status
+```
+
+Shows all Account Blueprints in a sortable table. Filter by tier, industry, or status.
+
+**Global Tasks Dashboard** (`Global_Tasks_Dashboard.base`):
+
+```yaml
+filters:
+  and:
+    - file.hasTag("task")
+    - status != "done"
+    - status != "cancelled"
+views:
+  - type: table
+    name: "Task List (By Priority)"
+    sort:
+      - property: priority
+        direction: DESC
+  - type: cards
+    name: "Task Kanban"
+    groupBy:
+      property: status
+```
+
+Two views of the same data:
+- **Table view** -- all open tasks sorted by priority, showing customer, project, and due date.
+- **Kanban view** -- tasks grouped into columns by status (open | in-progress | blocked). Drag cards between columns to update status.
+
+#### Account-Specific Dashboards (inside Accounts/)
+
+Each account gets its own `.base` file that queries only meetings for that customer.
+
+**Example** (`Accounts/Acme_Corp_Meetings.base`):
+
+```yaml
+filters:
+  and:
+    - file.tags.contains("meeting")
+    - customer.contains("Acme_Corp")
+views:
+  - type: table
+    name: "Interaction Log"
+    sort:
+      - property: date
+        direction: DESC
+    columns:
+      - property: date
+      - property: file.name
+      - property: participants
+      - property: tags
+```
+
+**How it's embedded:** The Account Blueprint includes this at the bottom:
+
+```markdown
+## Interaction Log
+> Managed via the Obsidian Bases plugin.
+
+![[Acme_Corp_Meetings.base]]
+```
+
+The `![[...]]` embed syntax renders the `.base` file inline. When you open the Account Blueprint, you see a live, auto-updating table of every meeting with that customer -- no manual list to maintain. New meetings automatically appear as soon as they have the right `company:` frontmatter.
+
+#### Creating a New Dashboard
+
+When you add a new account, create its meeting dashboard:
+
+1. Create `Accounts/New_Account_Meetings.base`
+2. Set the filter to match the canonical name: `customer.contains("New_Account")`
+3. Embed it in the Account Blueprint: `![[New_Account_Meetings.base]]`
+
+The AI assistant does this automatically when creating new Account Blueprints via the `process-notes` skill.
+
+### Auto-Generated Indexes
+
+Two files are regenerated by the `generate-vault-index` skill (via `scripts/generate_vault_index.py`). They provide a machine-readable snapshot of the vault state.
+
+**`_vault_index.md`** -- vault statistics and file index:
+- Total counts: accounts, meetings, open tasks
+- Table of all accounts with tier, industry, SA, status
+- Meetings grouped by account with date, type, and summary
+- Open tasks with customer, priority, and due date
+- Consistency warnings (invalid company names, missing fields)
+
+**`_stakeholder_map.md`** -- person cross-reference:
+- Every person mentioned in any `participants:` field across the vault
+- Which accounts they appear in
+- Number of meetings attended
+- Date last seen
+
+These files are the AI assistant's "cold start" context. When you begin a new session and ask about an account, the assistant reads `_vault_index.md` to quickly understand the vault state before diving into specific notes.
+
+**When to regenerate:** Run `generate-vault-index` after processing a batch of meeting notes, before strategy sessions, or whenever you want to check vault consistency. The script also validates frontmatter and reports issues like misspelled company names or missing required fields.
 
 ---
 
