@@ -47,10 +47,31 @@ const targetDir = path.resolve(args[1] || './RedHat_Docs');
         return Array.from(new Set(hrefs.filter(h => h.includes(`/${version}/html/`) || h.includes(`/${version}/html-single/`))));
     }, versionPart);
     
-    console.log(`Found ${guideUrls.length} guide URLs. Extraction starting...`);
-    
+    console.log(`Found ${guideUrls.length} guide URLs.`);
+
     const pdfLinks = [];
-    
+
+    // Fallback for new-style docs: look for a dedicated PDF download page
+    if (guideUrls.length === 0) {
+        console.log("No HTML guide links found. Looking for a PDF download page...");
+        const pdfPageUrl = await page.evaluate(() => {
+            const a = Array.from(document.querySelectorAll('a')).find(el => el.href.includes('download_pdf'));
+            return a ? a.href : null;
+        });
+        if (pdfPageUrl) {
+            console.log(`Found PDF download page: ${pdfPageUrl}`);
+            await page.goto(pdfPageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+            await new Promise(r => setTimeout(r, 3000));
+            const directPdfs = await page.evaluate(() =>
+                Array.from(new Set(Array.from(document.querySelectorAll('a')).map(a => a.href).filter(h => h.endsWith('.pdf'))))
+            );
+            console.log(`Found ${directPdfs.length} PDF links on download page.`);
+            pdfLinks.push(...directPdfs);
+        } else {
+            console.log("No PDF download page found either.");
+        }
+    }
+
     for (const url of guideUrls) {
         console.log(`Visiting ${url}...`);
         try {

@@ -18,7 +18,7 @@ The Obsidian vault path is configured via `$SA_KNOWLEDGE_PATH` (defined in `.env
 ## Operational Workflow
 - **Discovery:** If the user mentions a company, proactively check the local directory or search for related notes if MCPs are active. 
    - **GDrive Search Strategy:** Always read the company's Account Blueprint frontmatter to find their `GDrive Folder` ID. Use this ID to scope your `searchDriveFiles` MCP queries. If a specific folder ID is not found, you MUST scope your search using the master parent folder IDs defined in the Obsidian vault's Atlas (see `Atlas/GDrive Folders.md`).
-- **File Placement:** Always store Account Blueprints and related account strategy files in `$SA_KNOWLEDGE_PATH/SA_Knowledge/Accounts/`. Never place them in the repo root directory.
+- **File Placement:** Always store Account Blueprints in `$SA_KNOWLEDGE_PATH/SA_Knowledge/Accounts/` and Partner Blueprints in `$SA_KNOWLEDGE_PATH/SA_Knowledge/Partners/`. Never place them in the repo root directory.
 - **Google Workspace Access:** When asked to process Google Drive/Docs links or read emails, use the respective MCP (Google Drive MCP or Gmail MCP). If these MCPs are not available in your current session, inform the user that the specific MCP needs to be enabled.
 - **Proactivity:** At the end of a session, if an action item was identified, suggest which skill should be run next (e.g., "I've identified 3 action items. Should I run the `process-notes` skill to update your Obsidian vault?").
 
@@ -29,11 +29,14 @@ On first interaction with the vault, read `$SA_KNOWLEDGE_PATH/SA_Knowledge/_VAUL
 
 ### Canonical Company Names
 Always use these exact names in `company:` frontmatter fields (as wikilinks):
-`O2_CZ`, `SPCSS`, `Skoda_Auto`, `CEZ_Distribuce`, `ČEZ_Group`, `EGD`
+`O2_CZ`, `SPCSS`, `Skoda_Auto`, `CEZ_Distribuce`, `ČEZ_Group`, `EGD`, `NÚKIB`
 Minor accounts: `CETIN`, `Tipsport`, `PPF_Banka`
 
+### Unified `company` Field
+All vault note types (meetings, tasks, projects) use the **`company:`** frontmatter field to identify the associated account. Never use `customer:` — it was a legacy inconsistency that has been corrected. Base file filters must also use `company.contains(...)`, not `customer.contains(...)`.
+
 ### Meeting Type Vocabulary
-Valid values for `type:` field: `sync`, `workshop`, `discovery`, `qbr`, `review`, `escalation`, `prep`, `internal`, `demo`
+Valid values for `type:` field: `sync`, `workshop`, `discovery`, `qbr`, `review`, `escalation`, `prep`, `internal`, `demo`, `informal`
 
 ### Date Format
 Always use `YYYY-MM-DD` (dashes, not slashes) in all frontmatter date fields.
