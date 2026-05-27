@@ -38,6 +38,9 @@ All vault note types (meetings, tasks, projects) use the **`company:`** frontmat
 ### Meeting Type Vocabulary
 Valid values for `type:` field: `sync`, `workshop`, `discovery`, `qbr`, `review`, `escalation`, `prep`, `internal`, `demo`, `informal`
 
+### Vault Language
+All vault content (body text, section headings, descriptions) must be written in **Czech** by default. Switch to English only when explicitly requested or when sharing with international audience. Technical terms, product names, and SKU identifiers stay in their original form (English).
+
 ### Date Format
 Always use `YYYY-MM-DD` (dashes, not slashes) in all frontmatter date fields.
 
