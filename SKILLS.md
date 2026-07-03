@@ -11,6 +11,7 @@ Skills are specialized, repeatable workflows that guide the AI assistant to perf
 - **`redact-confidential`**: (Planned) Automatically anonymizes customer data for external reporting.
 - **`rh-docs-downloader`**: Downloads all Red Hat product documentation guides as PDFs when provided with a base documentation URL.
 - **`generate-vault-index`**: Runs a Python script to regenerate `_vault_index.md` and `_stakeholder_map.md` from vault frontmatter, then reports consistency warnings.
+- **`manage-contact`**: Creates or updates a Contact note with dynamic Interactions via an Obsidian Bases embed. Always creates both the `.md` contact file and the corresponding `_Meetings.base` file in `Contacts/_bases/`.
 
 ## How to use
 To invoke a skill, tell your AI CLI assistant:

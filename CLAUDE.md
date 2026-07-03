@@ -29,8 +29,8 @@ On first interaction with the vault, read `$SA_KNOWLEDGE_PATH/SA_Knowledge/_VAUL
 
 ### Canonical Company Names
 Always use these exact names in `company:` frontmatter fields (as wikilinks):
-`O2_CZ`, `SPCSS`, `Skoda_Auto`, `CEZ_Distribuce`, `ČEZ_Group`, `EGD`, `NÚKIB`
-Minor accounts: `CETIN`, `Tipsport`, `PPF_Banka`
+`O2_CZ`, `SPCSS`, `Skoda_Auto`, `CEZ_Distribuce`, `ČEZ_Group`, `EGD`, `NAKIT`, `NÚKIB`
+Minor accounts: `CETIN`, `Tipsport`, `PPF_Banka`, `Kooperativa`
 
 ### Unified `company` Field
 All vault note types (meetings, tasks, projects) use the **`company:`** frontmatter field to identify the associated account. Never use `customer:` — it was a legacy inconsistency that has been corrected. Base file filters must also use `company.contains(...)`, not `customer.contains(...)`.
