@@ -1,7 +1,12 @@
-# Skill: schedule-tasks
+---
+name: schedule-tasks
+description: >
+  Bridge Obsidian tasks to Google Calendar by creating focus session events with obsidian://
+  deep links. Use when asked to schedule time, block calendar for a task, or find available
+  slots for focused work.
+---
 
-## Description
-Bridges the gap between Obsidian tasks and Google Calendar by creating native calendar events ("Focus Sessions") that point back to the source context in Obsidian.
+# Skill: schedule-tasks
 
 ## Trigger
 - "Schedule time for..."
@@ -11,7 +16,7 @@ Bridges the gap between Obsidian tasks and Google Calendar by creating native ca
 ## Workflow
 1. **Context Discovery:** Identify the source file in Obsidian (Account Atlas, Project note, or Daily Note).
 2. **Availability Check:** Query Google Calendar for a free slot on the requested day.
-3. **Constraint Validation:** 
+3. **Constraint Validation:**
     - Slots must be between **08:30 and 17:00**.
     - Avoid back-to-back conflicts if possible.
 4. **Execution:**

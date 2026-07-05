@@ -1,7 +1,12 @@
-# Skill: process-notes
+---
+name: process-notes
+description: >
+  Transform raw, messy meeting notes into structured, actionable documentation for a Solutions
+  Architect. Extracts executive summary, technical requirements, business drivers, stakeholder
+  insights, and action items. Use when asked to process meeting notes or structure raw input.
+---
 
-## Objective
-To transform raw, messy meeting notes into high-quality, actionable documentation for a Solutions Architect.
+# Skill: process-notes
 
 ## Inputs
 - A file path to a markdown note (Obsidian) or a text dump from a Google Doc.

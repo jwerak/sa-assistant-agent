@@ -1,7 +1,12 @@
-# Skill: analyze-emails
+---
+name: analyze-emails
+description: >
+  Analyze recent email threads (via Gmail MCP) with a customer, account team, or stakeholder.
+  Extracts active initiatives, pending action items, and stalled conversations needing follow-up.
+  Use when asked to go through emails with a company/person or analyze email threads.
+---
 
-## Description
-Analyzes recent email threads (using the Gmail MCP) with a specific customer, account team, or stakeholder. The goal is to extract active technical initiatives, pending action items, and identify "stalled" conversations that require a follow-up.
+# Skill: analyze-emails
 
 ## Trigger
 - "Go through my emails with [Company/Person]..."
@@ -21,21 +26,21 @@ Analyzes recent email threads (using the Gmail MCP) with a specific customer, ac
 Present the findings to the user in the following markdown structure. Do not save this directly to Obsidian unless the user asks you to append it to the Account Blueprint.
 
 ```markdown
-### 📧 Email Intelligence Report: [Target/Company]
+### Email Intelligence Report: [Target/Company]
 
 **Timeframe Analyzed:** [e.g., Last 3 months]
 
-#### 🚀 Active Initiatives
+#### Active Initiatives
 * **[Initiative Name]:** Brief summary of current status based on emails.
 * **[Initiative Name]:** ...
 
-#### ⚠️ Stalled or Forgotten Items
+#### Stalled or Forgotten Items
 * **[Topic]:** You asked [Name] for [information] on [Date], but there was no reply. *Recommendation: Send a gentle follow-up.*
 * **[Topic]:** Discussion about [Subject] ended without a clear next step.
 
-#### 🎯 Pending Action Items (Yours)
+#### Pending Action Items (Yours)
 * [ ] Task you need to complete based on email promises.
 
-#### ⏳ Waiting On (Others)
+#### Waiting On (Others)
 * [Name]: Waiting for them to provide [X].
 ```
