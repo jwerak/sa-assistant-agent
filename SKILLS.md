@@ -14,6 +14,8 @@ Skills are specialized, repeatable workflows that guide the AI assistant to perf
 - **`generate-vault-index`**: Runs a Python script to regenerate `_vault_index.md` and `_stakeholder_map.md` from vault frontmatter, then reports consistency warnings.
 - **`manage-contact`**: Creates or updates a Contact note with dynamic Interactions via an Obsidian Bases embed. Always creates both the `.md` contact file and the corresponding `_Meetings.base` file in `Contacts/_bases/`.
 - **`rh-docs-ocp-4.21`**: Answers technical questions and drafts architectures for OpenShift Container Platform 4.21 using locally downloaded official documentation (112 PDFs). Enforces a "read-before-answer" workflow to minimize hallucinations.
+- **`rh-docs-rhbk-26.6`**: Knowledge base from Red Hat Build of Keycloak 26.6 documentation (14 guides, ~1,567 pages). Covers OIDC/SAML, authorization services, HA/multi-site, Operator deployment, identity brokering, user federation, SPIs, and theming.
+- **`rh-ocpvirt-4.21`**: Knowledge base from OpenShift Virtualization 4.21 documentation (559 pages). Covers KubeVirt VM lifecycle, live migration, bridge/SR-IOV/OVN networking, storage (CDI/DataVolumes), instance types, monitoring, and backup/restore.
 
 ## How to use
 To invoke a skill, tell your AI CLI assistant:
