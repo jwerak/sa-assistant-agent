@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bifrost vs Praxis — Analýza průniku funkcionalit</title>
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --surface: #ffffff;
+    --surface2: #f0f1f4;
+    --border: #dfe1e6;
+    --text: #1a1d27;
+    --text-muted: #5e6278;
+    --accent: #4361ee;
+    --accent-dim: rgba(67,97,238,0.1);
+    --green: #16a34a;
+    --green-dim: rgba(22,163,74,0.1);
+    --red: #dc2626;
+    --red-dim: rgba(220,38,38,0.1);
+    --amber: #ca8a04;
+    --amber-dim: rgba(202,138,4,0.1);
+    --cyan: #0891b2;
+    --cyan-dim: rgba(8,145,178,0.1);
+    --purple: #7c3aed;
+    --purple-dim: rgba(124,58,237,0.1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+  .header h1 .vs { color: var(--text-muted); font-weight: 400; }
+  .header .subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+  .header .date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+  }
+
+  /* Verdict Banner */
+  .verdict-banner {
+    background: linear-gradient(135deg, rgba(74,222,128,0.08), rgba(108,138,255,0.08));
+    border: 1px solid rgba(74,222,128,0.25);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+  .verdict-banner h2 {
+    font-size: 1.3rem;
+    color: var(--green);
+    margin-bottom: 0.75rem;
+  }
+  .verdict-banner p {
+    color: var(--text-muted);
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 0.95rem;
+  }
+  .verdict-banner .coverage {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    background: var(--surface);
+    padding: 0.5rem 1.5rem;
+    border-radius: 99px;
+    font-size: 0.9rem;
+  }
+  .coverage-bar {
+    width: 120px;
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .coverage-bar-fill {
+    height: 100%;
+    width: 65%;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    border-radius: 99px;
+  }
+
+  /* Product cards */
+  .products {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .product-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+  }
+  .product-card .type {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .product-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .meta-item {
+    font-size: 0.85rem;
+  }
+  .meta-item .label { color: var(--text-muted); }
+  .meta-item .value { font-weight: 600; }
+  .bifrost-card { border-top: 3px solid var(--accent); }
+  .praxis-card { border-top: 3px solid var(--purple); }
+
+  /* Section */
+  .section {
+    margin-bottom: 2.5rem;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-header h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+  .section-header .badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    font-weight: 600;
+  }
+  .badge-green { background: var(--green-dim); color: var(--green); }
+  .badge-red { background: var(--red-dim); color: var(--red); }
+  .badge-amber { background: var(--amber-dim); color: var(--amber); }
+  .badge-cyan { background: var(--cyan-dim); color: var(--cyan); }
+  .badge-purple { background: var(--purple-dim); color: var(--purple); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.9rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  thead th {
+    background: var(--surface2);
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(0,0,0,0.02); }
+  td.feature { font-weight: 600; }
+
+  /* Status indicators */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+  }
+  .status-yes { background: var(--green-dim); color: var(--green); }
+  .status-no { background: var(--red-dim); color: var(--red); }
+  .status-partial { background: var(--amber-dim); color: var(--amber); }
+  .status-roadmap { background: var(--cyan-dim); color: var(--cyan); }
+  .status-better { background: var(--purple-dim); color: var(--purple); }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-green { background: var(--green); }
+  .dot-red { background: var(--red); }
+  .dot-amber { background: var(--amber); }
+  .dot-cyan { background: var(--cyan); }
+
+  /* Priority */
+  .priority {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .prio-critical { background: var(--red-dim); color: var(--red); }
+  .prio-high { background: var(--amber-dim); color: var(--amber); }
+  .prio-medium { background: var(--accent-dim); color: var(--accent); }
+  .prio-low { background: rgba(0,0,0,0.05); color: var(--text-muted); }
+
+  /* Roadmap */
+  .roadmap {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .roadmap-phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  .roadmap-phase h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .roadmap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    font-size: 0.88rem;
+  }
+  .roadmap-item .icon { flex-shrink: 0; margin-top: 0.15rem; }
+  .phase-1 { border-top: 3px solid var(--red); }
+  .phase-1 h3 { color: var(--red); }
+  .phase-2 { border-top: 3px solid var(--amber); }
+  .phase-2 h3 { color: var(--amber); }
+  .phase-3 { border-top: 3px solid var(--accent); }
+  .phase-3 h3 { color: var(--accent); }
+
+  /* Advantages */
+  .advantages {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .adv-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.15rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .adv-item h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+  .adv-item p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.82rem;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 1rem; }
+    .products, .roadmap, .advantages { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Bifrost <span class="vs">vs</span> Praxis</h1>
+    <div class="subtitle">Analýza průniku funkcionalit — může produktizovaný Praxis nahradit Bifrost?</div>
+    <div class="date">Generováno: 21. září 2026</div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict-banner">
+    <h2>&#10003; ANO, s podmínkami</h2>
+    <p>Praxis již dnes pokrývá ~65 % funkcionalit Bifrostu. Má 3 kritické gapy (multi-provider normalizace, failover, semantic caching), ale v oblastech security, protokolové podpory a architektonické čistoty Bifrost překonává.</p>
+    <div class="coverage">
+      <span>Aktuální pokrytí</span>
+      <div class="coverage-bar"><div class="coverage-bar-fill"></div></div>
+      <span style="font-weight:700">~65 %</span>
+    </div>
+  </div>
+
+  <!-- PRODUCT CARDS -->
+  <div class="products">
+    <div class="product-card bifrost-card">
+      <h3>Bifrost</h3>
+      <div class="type">AI Gateway &middot; maximhq/bifrost</div>
+      <div class="product-meta">
+        <div class="meta-item"><span class="label">Jazyk</span><br><span class="value">Go</span></div>
+        <div class="meta-item"><span class="label">Licence</span><br><span class="value">Apache 2.0</span></div>
+        <div class="meta-item"><span class="label">GitHub</span><br><span class="value">8.2k &#9733;</span></div>
+        <div class="meta-item"><span class="label">Přístup</span><br><span class="value">Hotový produkt</span></div>
+        <div class="meta-item"><span class="label">Provideři</span><br><span class="value">23+ nativně</span></div>
+        <div class="meta-item"><span class="label">Backer</span><br><span class="value">YC W22</span></div>
+      </div>
+    </div>
+    <div class="product-card praxis-card">
+      <h3>Praxis</h3>
+      <div class="type">AI-native Proxy Framework &middot; praxis-proxy/praxis</div>
+      <div class="product-meta">
+        <div class="meta-item"><span class="label">Jazyk</span><br><span class="value">Rust</span></div>
+        <div class="meta-item"><span class="label">Licence</span><br><span class="value">MIT</span></div>
+        <div class="meta-item"><span class="label">Rozšíření</span><br><span class="value">Compile-time</span></div>
+        <div class="meta-item"><span class="label">Přístup</span><br><span class="value">Framework</span></div>
+        <div class="meta-item"><span class="label">Provideři</span><br><span class="value">OpenAI + Anthropic</span></div>
+        <div class="meta-item"><span class="label">AI extension</span><br><span class="value">praxis-proxy/ai</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><span class="status status-yes">&#10003; Ano</span> plně implementováno</div>
+    <div class="legend-item"><span class="status status-partial">&#9679; Částečně</span> neúplná implementace</div>
+    <div class="legend-item"><span class="status status-roadmap">&#9672; Roadmap</span> plánováno</div>
+    <div class="legend-item"><span class="status status-no">&#10005; Ne</span> chybí</div>
+    <div class="legend-item"><span class="status status-better">&#9733; Lepší</span> převyšuje konkurenta</div>
+  </div>
+
+  <!-- SECTION: INTERSECTION -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Průnik — co oba umí</h2>
+      <span class="badge badge-green">17 funkcí</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:4%">#</th>
+          <th style="width:24%">Funkcionalita</th>
+          <th style="width:36%">Bifrost</th>
+          <th style="width:36%">Praxis</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td class="feature">Multi-provider AI routing</td>
+          <td>23+ providerů, model prefix <code>openai/gpt-4o</code></td>
+          <td><code>model_to_header</code> filtr + header-based routing na clustery</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td class="feature">Load balancing</td>
+          <td>Weighted key selection (~10 ns)</td>
+          <td><span class="status status-better">&#9733; Lepší</span> 5 algoritmů: round-robin, least-conn, P2C, consistent-hash, weighted</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td class="feature">Rate limiting</td>
+          <td>Per key / team / customer</td>
+          <td><span class="status status-better">&#9733; Lepší</span> Token bucket, per-IP + global, burst, 429 + Retry-After</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td class="feature">Health checks</td>
+          <td>Implicitně přes failover logiku</td>
+          <td><span class="status status-better">&#9733; Lepší</span> Active (HTTP/TCP probes) + Passive (inline tracking)</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td class="feature">Prometheus metriky</td>
+          <td>Nativní</td>
+          <td><code>/metrics</code> endpoint na admin listeneru</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td class="feature">MCP podpora</td>
+          <td>Client + Gateway/Server</td>
+          <td><span class="status status-better">&#9733; Lepší</span> Metadata extraction, broker mode, tool catalog aggregation</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td class="feature">Streaming (SSE)</td>
+          <td>Nativní pro všechny providery</td>
+          <td>Transparentní passthrough + StreamBuffer inspect</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td class="feature">Guardrails</td>
+          <td>Enterprise feature</td>
+          <td><code>ai_guardrails</code> filtr (ext. provider, NVIDIA NeMo)</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td class="feature">TLS</td>
+          <td>Podporováno</td>
+          <td><span class="status status-better">&#9733; Lepší</span> Termination + re-encryption, Rustls (zero C FFI)</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td class="feature">Credential management</td>
+          <td>Virtual keys + env vars</td>
+          <td><code>credential_injection</code> per-cluster + env var sources</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td class="feature">Token usage tracking</td>
+          <td>Hierarchický budget management</td>
+          <td>3 headery: input / output / total</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td class="feature">OpenAI Chat Completions</td>
+          <td>Unified <code>/v1/chat/completions</code></td>
+          <td>Plná podpora včetně routingu</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td class="feature">Anthropic Messages API</td>
+          <td>Drop-in passthrough</td>
+          <td><span class="status status-better">&#9733; Lepší</span> 5 filtrů: klasifikace, validace, headers, bidirectional translation, stream events</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td class="feature">Prompt enrichment</td>
+          <td>Via pluginy</td>
+          <td><code>prompt_enrich</code> filtr (system/user msg injection)</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td class="feature">Konfigurace</td>
+          <td>Web UI + API + file-based</td>
+          <td>File-based s atomic hot-reload</td>
+        </tr>
+        <tr>
+          <td>16</td>
+          <td class="feature">Graceful shutdown</td>
+          <td>Podporováno</td>
+          <td>Konfigurovatelný drain timeout</td>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td class="feature">Docker deployment</td>
+          <td>Oficiální image</td>
+          <td>Builditelný</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION: BIFROST-ONLY -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Bifrost má, Praxis chybí</h2>
+      <span class="badge badge-red">15 gapů</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:4%">#</th>
+          <th style="width:24%">Funkcionalita</th>
+          <th style="width:10%">Priorita</th>
+          <th style="width:14%">Praxis status</th>
+          <th style="width:48%">Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td class="feature">Unified API pro 23+ providerů</td>
+          <td><span class="priority prio-critical">Kritická</span></td>
+          <td><span class="status status-partial">&#9679; Částečně</span></td>
+          <td>Praxis má translation jen pro OpenAI + Anthropic. Chybí Bedrock, Vertex AI, Azure OpenAI, Cohere, Mistral, Groq, Cerebras, Ollama aj.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td class="feature">Automatický failover mezi providery</td>
+          <td><span class="priority prio-critical">Kritická</span></td>
+          <td><span class="status status-roadmap">&#9672; Roadmap</span></td>
+          <td>Ordered failover chains s automatickým API překladem. Core "zero downtime" feature Bifrostu.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td class="feature">Semantic caching</td>
+          <td><span class="priority prio-critical">Kritická</span></td>
+          <td><span class="status status-roadmap">&#9672; Roadmap</span></td>
+          <td>Prompt deduplikace přes vector similarity. Bifrost má built-in plugin s vector store backendem.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td class="feature">Budget management</td>
+          <td><span class="priority prio-high">Vysoká</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>Hierarchické limity: virtual keys → teams → customers. Praxis má jen informativní token headery.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td class="feature">Cost attribution</td>
+          <td><span class="priority prio-high">Vysoká</span></td>
+          <td><span class="status status-roadmap">&#9672; Roadmap</span></td>
+          <td>Token counting per user / session / model / endpoint.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td class="feature">Web UI</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>Vizuální konfigurace, real-time monitoring, analytics. Řešitelné externím dashboardem.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td class="feature">User provisioning (OIDC)</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>OAuth 2.0 / OIDC login, directory sync. Praxis má Basic Auth + mTLS.</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td class="feature">Virtual keys</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>Abstrakce nad reálnými API klíči pro governance a tracking.</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td class="feature">SDK drop-in replacement</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-partial">&#9679; Částečně</span></td>
+          <td>Bifrost: OpenAI, Anthropic, Google GenAI, LangChain, LiteLLM. Praxis: jen OpenAI + Anthropic.</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td class="feature">Multimodal (text, image, audio)</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-partial">&#9679; Částečně</span></td>
+          <td>Praxis projde multimodal jako proxy passthrough, ale nemá dedikovanou logiku.</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td class="feature">Cluster mode</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>Multi-node horizontal scaling (Bifrost enterprise).</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td class="feature">Plugin marketplace</td>
+          <td><span class="priority prio-medium">Střední</span></td>
+          <td><span class="status status-partial">&#9679; Částečně</span></td>
+          <td>Bifrost: 7 runtime pluginů. Praxis: compile-time Rust filtry (jiný model).</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td class="feature">NPX one-click install</td>
+          <td><span class="priority prio-low">Nízká</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>Rust binary vyžaduje build nebo pre-built release.</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td class="feature">Helm charts</td>
+          <td><span class="priority prio-low">Nízká</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>Kubernetes deployment. Lze snadno vytvořit.</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td class="feature">Terraform moduly</td>
+          <td><span class="priority prio-low">Nízká</span></td>
+          <td><span class="status status-no">&#10005; Ne</span></td>
+          <td>IaC deployment šablony. Lze vytvořit.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION: PRAXIS ADVANTAGES -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Kde Praxis Bifrost překonává</h2>
+      <span class="badge badge-purple">15 výhod</span>
+    </div>
+    <div class="advantages">
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>TCP/L4 Proxying</h4>
+        <p>Proxy libovolného TCP protokolu, nejen HTTP. Bifrost je čistě HTTP.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Circuit Breaker</h4>
+        <p>Per-cluster s half-open probe window a gradual recovery. Bifrost jen failover.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>A2A Protocol</h4>
+        <p>First-class Agent-to-Agent podpora s task-ownership routing. Bifrost nemá.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>OpenAI Responses API</h4>
+        <p>Kompletní <code>/v1/responses</code> implementace s conversation store (SQLite/PG).</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>StreamBuffer</h4>
+        <p>Unikátní peek-then-stream: inspekce prvních N bytů bez plného bufferingu.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Bidirectional API Translation</h4>
+        <p>Plná obousměrná Anthropic ↔ OpenAI transformace, ne jen passthrough.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Response Compression</h4>
+        <p>gzip, Brotli, Zstandard s content-type filtering a min size thresholds.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Kompletní Security Stack</h4>
+        <p>CORS, CSRF, IP ACL, mTLS, Basic Auth, SSRF protection, no-unsafe-code policy.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Path/URL Rewriting</h4>
+        <p>Regex-based, prefix strip/add, query string manipulation.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Compile-time Extensions</h4>
+        <p>Rust trait-based s auto-discovery. Zero runtime overhead.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Atomic Hot-Reload</h4>
+        <p>In-flight requests dokončí na staré konfiguraci, nová se swapne atomicky.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>JSON-RPC 2.0 Foundation</h4>
+        <p>Generická podpora pro agentic protokoly na úrovni envelope parsingu.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>gRPC Detection</h4>
+        <p>Automatická detekce gRPC/gRPC-Web content types.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>Response Persistence</h4>
+        <p>Nativní SQLite/PostgreSQL store pro Responses API konverzace.</p>
+      </div>
+      <div class="adv-item" style="border-left: 3px solid var(--purple);">
+        <h4>No-unsafe-code Policy</h4>
+        <p><code>unsafe_code = "deny"</code> v celém workspace. Rustls bez OpenSSL/C FFI.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: ROADMAP -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Roadmapa pro plnou paritu</h2>
+    </div>
+    <div class="roadmap">
+      <div class="roadmap-phase phase-1">
+        <h3>Priorita 1 — Must-have</h3>
+        <div class="roadmap-item">
+          <span class="icon">&#9632;</span>
+          <span>Provider translation filtry (Bedrock, Vertex AI, Azure OpenAI, Cohere, Mistral, Groq)</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9632;</span>
+          <span>Provider failover chains s automatickým API překladem</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9632;</span>
+          <span>Semantic caching (vector similarity search)</span>
+        </div>
+      </div>
+      <div class="roadmap-phase phase-2">
+        <h3>Priorita 2 — Enterprise</h3>
+        <div class="roadmap-item">
+          <span class="icon">&#9670;</span>
+          <span>Budget management &amp; cost attribution</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9670;</span>
+          <span>Virtual keys / tenant isolation</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9670;</span>
+          <span>Web UI nebo API-driven config</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9670;</span>
+          <span>OIDC integrace</span>
+        </div>
+      </div>
+      <div class="roadmap-phase phase-3">
+        <h3>Priorita 3 — DX &amp; Ops</h3>
+        <div class="roadmap-item">
+          <span class="icon">&#9675;</span>
+          <span>Pre-built binaries / container images</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9675;</span>
+          <span>Helm charts + Terraform moduly</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9675;</span>
+          <span>SDK kompatibilní testing (LangChain, LiteLLM)</span>
+        </div>
+        <div class="roadmap-item">
+          <span class="icon">&#9675;</span>
+          <span>Migrace dokumentace z Bifrost</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Bifrost vs Praxis — Competitive Feature Analysis &middot; Zdroje: <a href="https://github.com/maximhq/bifrost" style="color:var(--accent)">github.com/maximhq/bifrost</a> &middot; <a href="https://praxis.fast/docs/getting-started/features" style="color:var(--accent)">praxis.fast/docs</a> &middot; <a href="https://bifrost.so" style="color:var(--accent)">bifrost.so</a></p>
+  </div>
+
+</div>
+</body>
+</html>

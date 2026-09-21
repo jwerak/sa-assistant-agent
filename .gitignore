@@ -13,3 +13,7 @@ SA_Knowledge/
 .gemini/
 .claude/
 .env
+
+# Node.js / Playwright
+node_modules/
+.playwright-mcp/

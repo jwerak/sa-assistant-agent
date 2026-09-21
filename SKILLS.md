@@ -16,6 +16,10 @@ Skills are specialized, repeatable workflows that guide the AI assistant to perf
 - **`rh-docs-ocp-4.21`**: Answers technical questions and drafts architectures for OpenShift Container Platform 4.21 using locally downloaded official documentation (112 PDFs). Enforces a "read-before-answer" workflow to minimize hallucinations.
 - **`rh-docs-rhbk-26.6`**: Knowledge base from Red Hat Build of Keycloak 26.6 documentation (14 guides, ~1,567 pages). Covers OIDC/SAML, authorization services, HA/multi-site, Operator deployment, identity brokering, user federation, SPIs, and theming.
 - **`rh-ocpvirt-4.21`**: Knowledge base from OpenShift Virtualization 4.21 documentation (559 pages). Covers KubeVirt VM lifecycle, live migration, bridge/SR-IOV/OVN networking, storage (CDI/DataVolumes), instance types, monitoring, and backup/restore.
+- **`generate-diagram`**: Generates architecture and infrastructure diagrams using the Python `diagrams` library with 86 official Red Hat product/technology icons and brand-compliant colors. Produces PNG/SVG output.
+- **`ansible-demo-lookup`**: Searches the `product-demos` repository (70+ AAP demos across 7 categories) by keyword, category, or customer context. Returns matching demos with descriptions, prerequisites, and freshness status. Proactively flags stale demos and suggests repo/skill updates.
+- **`ansible-engagement-plan`**: Plans an Ansible engagement (demo, workshop, PoC, discovery) for a specific customer. Reads account context from the Obsidian vault, maps customer tech stack to relevant demos, builds a sequenced agenda with prerequisites and talking points.
+- **`rhdp-demo-search`**: Searches the Red Hat Demo Platform (RHDP) catalog (336 demos, workshops, labs, open environments across 28 product families) by keyword, product, category, or customer context. Returns ranked results with direct catalog ordering links. Data sourced from `catalog.demo.redhat.com` API.
 
 ## How to use
 To invoke a skill, tell your AI CLI assistant:
